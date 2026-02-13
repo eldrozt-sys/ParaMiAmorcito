@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Solo Tú 💜</title>
+
+<style>
+body{
+margin:0;
+font-family:Segoe UI, sans-serif;
+background:black;
+color:white;
+text-align:center;
+overflow-x:hidden;
+}
+
+/* Fondo estrellas */
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+/* Pantallas */
+.pantalla{
+min-height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+
+.oculto{
+display:none;
+}
+
+/* Caja login */
+#loginBox{
+background:rgba(0,0,0,0.6);
+padding:30px;
+border-radius:20px;
+box-shadow:0 0 30px #8e2de2;
+}
+
+button{
+padding:12px 25px;
+border:none;
+border-radius:30px;
+background:linear-gradient(45deg,#ff4e50,#8e2de2);
+color:white;
+cursor:pointer;
+font-size:16px;
+margin-top:10px;
+}
+
+input{
+padding:10px;
+border-radius:10px;
+border:none;
+margin-top:10px;
+}
+
+/* Nombre */
+#nombre{
+font-size:45px;
+min-height:60px;
+margin-bottom:10px;
+}
+
+/* Contador bonito */
+#contador{
+display:flex;
+gap:15px;
+margin:20px 0;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.tiempoBox{
+background:rgba(255,255,255,0.1);
+padding:15px;
+border-radius:15px;
+min-width:90px;
+box-shadow:0 0 15px #ff4e50;
+}
+
+.numero{
+font-size:22px;
+font-weight:bold;
+}
+
+.label{
+font-size:12px;
+opacity:0.8;
+}
+
+/* Mensajes animados */
+#mensajes{
+margin:20px 0;
+min-height:150px;
+font-size:18px;
+line-height:1.5;
+text-align:left;
+max-width:500px;
+}
+
+/* Foto */
+img{
+width:280px;
+border-radius:20px;
+margin:20px;
+box-shadow:0 0 30px #ff4e50;
+}
+
+/* Video */
+video{
+width:300px;
+border-radius:20px;
+margin:20px;
+background:black;
+}
+
+/* Carta final */
+#carta{
+max-width:500px;
+margin-top:20px;
+opacity:0;
+transition:2s;
+}
+
+/* Corazones */
+.corazon{
+position:fixed;
+bottom:-20px;
+color:#ff4e50;
+animation:flotar 6s linear infinite;
+}
+
+@keyframes flotar{
+to{
+transform:translateY(-100vh);
+opacity:0;
+}
+}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div id="login" class="pantalla">
+<div id="loginBox">
+<h1>Ingresa nuestra fecha 💌</h1>
+<p>La fecha en la que comenzó nuestra historia</p>
+<input type="password" id="password" placeholder="DDMMAAAA">
+<br>
+<button onclick="verificar()">Entrar</button>
+<p id="errorMsg" style="margin-top:10px;color:#ff9a9e;"></p>
+</div>
+</div>
+
+<div id="contenido" class="pantalla oculto">
+
+<h1 id="nombre"></h1>
+
+<div id="mensajes"></div>
+
+<div id="contador">
+<div class="tiempoBox">
+<div class="numero" id="dias">0</div>
+<div class="label">DÍAS</div>
+</div>
+
+<div class="tiempoBox">
+<div class="numero" id="horas">0</div>
+<div class="label">HORAS</div>
+</div>
+
+<div class="tiempoBox">
+<div class="numero" id="minutos">0</div>
+<div class="label">MINUTOS</div>
+</div>
+
+<div class="tiempoBox">
+<div class="numero" id="segundos">0</div>
+<div class="label">SEGUNDOS</div>
+</div>
+</div>
+
+<img src="foto.jpg">
+
+<video id="video" controls>
+<source src="amor.mp4" type="video/mp4">
+Tu navegador no soporta video.
+</video>
+
+<div id="carta">
+<p>
+No eres coincidencia.  
+Eres la mejor decisión que tomé 💜
+</p>
+</div>
+
+</div>
+
+<audio id="music" src="cancion.mp3" loop></audio>
+
+<script>
+/* CONFIGURA */
+const correctPassword="01082024";
+const fechaInicio=new Date(2024,7,1);
+const nombreElla="Jazmine 💜";
+
+/* Mensajes de amor más emotivos */
+const mensajes=[
+"Si pudiera elegir un lugar seguro,",
+"sería a tu lado siempre, abrazados y riendo,",
+"cuando siento tu mano, el mundo desaparece,",
+"y cada mirada tuya me hace latir más fuerte,",
+"Cuanto más tiempo paso contigo,",
+"más me enamoro de ti cada día,",
+"— ¡Te Amo Infinitamente y siempre serás mi todo! 💜"
+];
+
+const music=document.getElementById("music");
+const video=document.getElementById("video");
+const mensajeBox=document.getElementById("mensajes");
+
+/* Estrellas */
+const canvas=document.getElementById("stars");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let stars=[];
+for(let i=0;i<150;i++){
+stars.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+size:Math.random()*2
+});
+}
+
+function drawStars(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="white";
+stars.forEach(s=>{
+ctx.beginPath();
+ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
+ctx.fill();
+});
+requestAnimationFrame(drawStars);
+}
+drawStars();
+
+/* Música al primer click */
+window.addEventListener("click",()=>{
+if(music.paused){
+music.volume=0.3;
+music.play();
+}
+});
+
+/* Verificar */
+function verificar(){
+const input=document.getElementById("password").value;
+if(input===correctPassword){
+document.getElementById("login").classList.add("oculto");
+document.getElementById("contenido").classList.remove("oculto");
+animarNombre();
+mostrarMensajes();
+iniciarContador();
+corazones();
+}else{
+document.getElementById("errorMsg").innerText="Esa no es nuestra fecha 💕";
+}
+}
+
+/* Nombre animado */
+function animarNombre(){
+let i=0;
+let intervalo=setInterval(()=>{
+if(i<nombreElla.length){
+document.getElementById("nombre").innerHTML+=nombreElla.charAt(i);
+i++;
+}else{
+clearInterval(intervalo);
+}
+},100);
+}
+
+/* Mostrar mensajes con máquina de escribir y que queden */
+function mostrarMensajes(){
+let linea=0;
+
+function escribirLinea(){
+if(linea<mensajes.length){
+let texto="";
+let chars=0;
+let intervalo=setInterval(()=>{
+texto+=mensajes[linea][chars];
+mensajeBox.innerHTML+=texto.charAt(chars);
+chars++;
+if(chars>=mensajes[linea].length){
+clearInterval(intervalo);
+mensajeBox.innerHTML+="<br>";
+linea++;
+setTimeout(escribirLinea,500);
+}
+},50);
+}
+}
+escribirLinea();
+}
+
+/* Contador con segundos */
+function iniciarContador(){
+setInterval(()=>{
+let ahora=new Date();
+let diff=ahora-fechaInicio;
+
+let dias=Math.floor(diff/(1000*60*60*24));
+let horas=Math.floor((diff/(1000*60*60))%24);
+let minutos=Math.floor((diff/(1000*60))%60);
+let segundos=Math.floor((diff/1000)%60);
+
+document.getElementById("dias").innerText=dias;
+document.getElementById("horas").innerText=horas;
+document.getElementById("minutos").innerText=minutos;
+document.getElementById("segundos").innerText=segundos;
+
+},1000);
+}
+
+/* Video pausa música */
+video.addEventListener("play",()=>{
+music.pause();
+});
+
+video.addEventListener("ended",()=>{
+music.play();
+document.getElementById("carta").style.opacity=1;
+});
+
+/* Corazones */
+function corazones(){
+setInterval(()=>{
+let c=document.createElement("div");
+c.className="corazon";
+c.innerHTML="❤";
+c.style.left=Math.random()*100+"vw";
+c.style.fontSize=(Math.random()*20+10)+"px";
+document.body.appendChild(c);
+setTimeout(()=>{c.remove();},6000);
+},500);
+}
+</script>
+
+</body>
+</html>
